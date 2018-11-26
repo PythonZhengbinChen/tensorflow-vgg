@@ -1,0 +1,15 @@
+VGG16 使用训练好的模型在使用的时候出现的几个问题：
+1. 关于resize 在新的版本上的更新，原来的模型没有指定mode的方式，需要在utils中增加mode='constant'熟悉
+img = skimage.transform.resize(img, (ny, nx), mode='constant')
+2. 关于出现dtypy= int与float之间的冲突的问题 在vgg16.build中出现
+这是由于red, green, blue = tf.split(rgb_scaled, 3, 3)中的split函数参数位置更新的原因，需要将原来放在第三个位置
+的rgb_scaled，移动到第一个参数的位置，具体参看tf.split函数的使用说明
+同样需要更新
+bgr = tf.concat([
+            blue - VGG_MEAN[0],
+            green - VGG_MEAN[1],
+            red - VGG_MEAN[2],
+        ], 3)
+       将原来数值为3的位置放得最后
+3.出现h5py的问题解决h5py的FutureWarning问题
+pip install --user numpy==1.13.0
